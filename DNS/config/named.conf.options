@@ -1,0 +1,15 @@
+options {
+    directory "/var/cache/bind";
+
+    # Autoriser les requêtes depuis n'importe où (pour le lab docker)
+    allow-query { any; };
+    recursion yes;
+    
+    # Forwarder vers Google si le nom n'est pas local (pour avoir internet)
+    forwarders {
+        8.8.8.8;
+    };
+
+    dnssec-validation no;
+    listen-on-v6 { any; };
+};

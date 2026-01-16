@@ -10,6 +10,17 @@ services:
     cap_add:
       - SYS_TIME
     restart: unless-stopped
+  dns_server:
+    build: ./dns
+    container_name: dns_server
+    image: my-bind9-image
+    ports:
+      - "20053:53/udp"
+      - "20053:53/tcp"
+    networks:
+      sae_network:
+        ipv4_address: 172.28.0.5
+    restart: always
 
 networks:
   lab_net:
@@ -17,3 +28,5 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/24
+
+        
