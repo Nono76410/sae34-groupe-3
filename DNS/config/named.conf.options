@@ -1,6 +1,9 @@
 options {
     directory "/var/cache/bind";
 
+    # Écouter sur toutes les interfaces
+    listen-on { any; };
+    
     # Autoriser les requêtes depuis n'importe où (pour le lab docker)
     allow-query { any; };
     recursion yes;
