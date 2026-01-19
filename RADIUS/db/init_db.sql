@@ -1,9 +1,3 @@
--- Créer la base de données RADIUS
-CREATE DATABASE IF NOT EXISTS radius;
-
--- Se connecter à la base de données radius
-\c radius;
-
 -- Créer les tables RADIUS
 CREATE TABLE IF NOT EXISTS radcheck (
     id SERIAL PRIMARY KEY,
@@ -78,11 +72,13 @@ CREATE INDEX idx_radacct_acctstarttime ON radacct(acctstarttime);
 
 -- Insérer des utilisateurs de test
 -- Utilisateur 1: steve / testing
-INSERT INTO radcheck (username, attribute, op, value) VALUES ('steve', 'User-Password', ':=', 'testing');
+INSERT INTO radcheck (username, attribute, op, value) VALUES ('steve', 'Cleartext-Password', ':=', 'testing');
+INSERT INTO radcheck (username, attribute, op, value) VALUES ('steve', 'Auth-Type', ':=', 'PAP');
 INSERT INTO radreply (username, attribute, op, value) VALUES ('steve', 'Reply-Message', '=', 'Welcome Steve');
 
 -- Utilisateur 2: sqluser / sqlpassword (pour test SQL)
-INSERT INTO radcheck (username, attribute, op, value) VALUES ('sqluser', 'User-Password', ':=', 'sqlpassword');
+INSERT INTO radcheck (username, attribute, op, value) VALUES ('sqluser', 'Cleartext-Password', ':=', 'sqlpassword');
+INSERT INTO radcheck (username, attribute, op, value) VALUES ('sqluser', 'Auth-Type', ':=', 'PAP');
 INSERT INTO radreply (username, attribute, op, value) VALUES ('sqluser', 'Reply-Message', '=', 'Welcome SQL User');
 
 -- Créer un rôle RADIUS avec les permissions appropriées

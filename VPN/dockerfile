@@ -5,29 +5,19 @@ RUN apt-get update && apt-get install -y \
     openvpn \
     openssl \
     iproute2 \
+    easy-rsa \
+    strace \
     && rm -rf /var/lib/apt/lists/*
 
 # Créer les répertoires nécessaires
-RUN mkdir -p /etc/openvpn/certs /var/log/openvpn
+RUN mkdir -p /etc/openvpn/certs /var/log/openvpn /opt/easyrsa
 
-# Générer les certificats directement
-RUN openssl genrsa -out /etc/openvpn/certs/ca.key 2048 && \
-    openssl req -new -x509 -days 365 -key /etc/openvpn/certs/ca.key \
-    -out /etc/openvpn/certs/ca.crt \
-    -subj "/C=FR/ST=IDF/L=Paris/O=LAB/CN=ca.lab.local" && \
-    openssl genrsa -out /etc/openvpn/certs/server.key 2048 && \
-    openssl req -new -key /etc/openvpn/certs/server.key \
-    -out /etc/openvpn/certs/server.csr \
-    -subj "/C=FR/ST=IDF/L=Paris/O=LAB/CN=vpn.lab.local" && \
-    openssl x509 -req -days 365 -in /etc/openvpn/certs/server.csr \
-    -CA /etc/openvpn/certs/ca.crt -CAkey /etc/openvpn/certs/ca.key -CAcreateserial \
-    -out /etc/openvpn/certs/server.crt && \
-    openssl dhparam -out /etc/openvpn/certs/dh.pem 2048 && \
-    openssl rand -hex 32 > /etc/openvpn/certs/ta.key && \
-    rm -f /etc/openvpn/certs/server.csr /etc/openvpn/certs/ca.srl
+# Copier le script de génération des certificats
+COPY generate_certs.sh /opt/generate_certs.sh
+RUN chmod +x /opt/generate_certs.sh && /opt/generate_certs.sh
 
 # Permissions
-RUN chmod 600 /etc/openvpn/certs/server.key /etc/openvpn/certs/ca.key /etc/openvpn/certs/ta.key
+RUN chmod 600 /etc/openvpn/certs/server.key /etc/openvpn/certs/ca.key /etc/openvpn/certs/ta.key 2>/dev/null || true
 
 # Copier la config du serveur
 COPY server.conf /etc/openvpn/server.conf
@@ -41,3 +31,4 @@ EXPOSE 1194/udp
 
 # Lancer OpenVPN
 ENTRYPOINT ["/entrypoint.sh"]
+
